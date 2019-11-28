@@ -2,6 +2,7 @@
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 /**
  * The task, which observes a shared queue in the producer/consumer design pattern.
@@ -52,11 +53,14 @@ public class Supervisor implements Runnable, Producer.Observer, Consumer.Observe
         lastConsumedCount = consumedCount;
 
         final int queueSize;
+        final Stream<Item> itemStream;
         synchronized (queue) {
             queueSize = queue.size();
+            itemStream = queue.stream();
         }
 
         System.out.printf("Pending count: %s\n", queueSize);
+//        itemStream.forEach(item -> System.out.println("\tItem : " + item.value));
         System.out.println("Producing speed: " + diffProducedCount + " i/s");
         System.out.println("Consuming speed: " + diffConsumedCount + " i/s");
     }
@@ -67,6 +71,7 @@ public class Supervisor implements Runnable, Producer.Observer, Consumer.Observe
     @Override
     public void onItemProduce(Item item) {
         producedCount.incrementAndGet();
+//        System.out.println("\u001B[31m" + "\tProduced : " + item.value + "\u001B[0m");
     }
 
     /**
@@ -75,6 +80,7 @@ public class Supervisor implements Runnable, Producer.Observer, Consumer.Observe
     @Override
     public void onItemConsume(Item item) {
         consumedCount.incrementAndGet();
+//        System.out.println("\u001B[36m" + "\tConsumed : " + item.value + "\u001B[0m");
     }
 }
 

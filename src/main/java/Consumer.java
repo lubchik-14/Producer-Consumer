@@ -33,15 +33,11 @@ public class Consumer implements Runnable {
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                final Item itemToConsume;
-                synchronized (queue) {
-                    itemToConsume = queue.poll();
-                }
+                final Item itemToConsume = queue.poll();
+
                 if (itemToConsume != null) {
                     consumeItem(itemToConsume);
                     observer.onItemConsume(itemToConsume);
-                } else {
-                    Thread.yield();
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

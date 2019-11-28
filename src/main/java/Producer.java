@@ -36,20 +36,10 @@ public class Producer implements Runnable {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 final Item producedItem = produceItem();
-
                 // try to offer produced item infinitely
-                while (true) {
-                    boolean hasOffered;
-                    synchronized (queue) {
-                        hasOffered = queue.offer(producedItem);
-                    }
-                    if (hasOffered) {
-                        break;
-                    } else {
-                        Thread.yield();
-                    }
+                if (queue.offer(producedItem)) {
+                    observer.onItemProduce(producedItem);
                 }
-                observer.onItemProduce(producedItem);
             } catch (InterruptedException e) {
                 // the work was interrupted in the middle of the job,
                 // thus we should not offer incomplete item in any case.
