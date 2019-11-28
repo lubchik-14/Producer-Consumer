@@ -24,7 +24,6 @@ public class Producer implements Runnable {
         if (observer == null) {
             throw new NullPointerException("observer is null");
         }
-
         this.queue = queue;
         this.observer = observer;
     }
@@ -38,11 +37,22 @@ public class Producer implements Runnable {
             try {
                 final Item producedItem = produceItem();
 
-                while (!queue.offer(producedItem)) {
-                    Thread.yield();
+                // try to offer produced item infinitely
+                while (true) {
+                    boolean hasOffered;
+                    synchronized (queue) {
+                        hasOffered = queue.offer(producedItem);
+                    }
+                    if (hasOffered) {
+                        break;
+                    } else {
+                        Thread.yield();
+                    }
                 }
                 observer.onItemProduce(producedItem);
             } catch (InterruptedException e) {
+                // the work was interrupted in the middle of the job,
+                // thus we should not offer incomplete item in any case.
                 Thread.currentThread().interrupt();
             }
         }

@@ -11,6 +11,8 @@ public class Main {
         final Supervisor supervisor = new Supervisor(queue);
 
         executorService.submit(new Consumer(queue, supervisor));
+        executorService.submit(new Consumer(queue, supervisor));
+        executorService.submit(new Producer(queue, supervisor));
         executorService.submit(new Producer(queue, supervisor));
 
         executorService.submit(supervisor);
